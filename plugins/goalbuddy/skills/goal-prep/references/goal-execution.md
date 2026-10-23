@@ -9,6 +9,8 @@ Codex:      /goal Follow docs/goals/<slug>/goal.md.
 Claude Code: /goalbuddy Follow docs/goals/<slug>/goal.md.
 ```
 
+For a newly scaffolded charter whose `Owner-Approved Contract` says `unconfirmed`, pause before executing tasks. Show the completed contract and obtain the owner's explicit confirmation, then update the charter. Existing boards without that section are not retroactively blocked; use their established charter and board state.
+
 ## Direct Execution Entry
 
 When `/goal` or `/goalbuddy` is invoked with raw user intent instead of an existing `docs/goals/<slug>/goal.md` path, run the Intake Compiler (see `SKILL.md`) before doing implementation work. The PM should not treat raw command text as an execution plan until it has:
@@ -19,11 +21,11 @@ When `/goal` or `/goalbuddy` is invoked with raw user intent instead of an exist
 - recorded authority and proof;
 - answered or explicitly defaulted the diagnostic ladder for vague/strategic input;
 - selected the safest first active task;
-- either asked the required guided intake question or written `goal.md` and `state.yaml` from a sufficiently clear intake.
+- shown a reviewable contract with acceptance criteria and received the owner's explicit confirmation before writing `goal.md` and `state.yaml`.
 
-When running the Intake Compiler inside an execution run, apply its extraction and diagnostic logic, but skip the prep-turn terminal steps: do not print another execution command and stop. Once the board is written, continue directly into execution.
+When running the Intake Compiler inside an execution run, apply its extraction, diagnostic, and owner-approved contract logic, but skip the prep-turn terminal step of printing another execution command and stopping. Wait for explicit confirmation of the displayed contract before writing the board. Once the confirmed board is written, continue directly into execution.
 
-If the raw input is detailed and already contains a plan, the first board task should validate and operationalize that plan rather than rediscovering from scratch. If the raw input is vague, run the diagnostic intake before creating the board unless the user explicitly says to use defaults. If the raw input is blocked by authority, policy, destructive action, credentials, or ambiguous completion proof, ask one guided question with options or create the smallest safe read-only task only after the user chooses to proceed.
+If the raw input is detailed and already contains a plan, the first board task should validate and operationalize that plan rather than rediscovering from scratch. If the raw input is vague, run the diagnostic intake before showing the contract unless the user explicitly says to use defaults. Defaults never replace explicit confirmation of the displayed contract. If the raw input is blocked by authority, policy, destructive action, credentials, or ambiguous completion proof, ask one guided question with options before proposing the contract.
 
 The target is not literal certainty. It is the highest practical likelihood of a successful goal run: preserve the user's intent, avoid the likely misfire, pick the earliest responsible phase, require proof, and keep advancing safe work until a final audit proves the full outcome.
 
@@ -319,6 +321,8 @@ Never complete because work looks substantial.
 At phase, risk, and final boundaries, run the full goal oracle suite — not only the commands named on the current task's card. Task-scoped re-runs miss regressions in suites the card never listed; the one regression a mid-phase Judge catches is usually exactly this kind.
 
 Completion is a Judge or PM audit task. The goal is done only when a final done Judge or PM receipt says the full original outcome is complete and maps completion to current receipts, verification, and the user's original outcome.
+
+For a charter with an owner-approved contract, delegate the final audit to a separate read-only Judge. The Judge checks actual artifacts and verification, assigns every `AC-#` exactly one status (`met`, `unmet`, or `unverified`) with evidence, and checks the original outcome, breadth, and constraints separately. The PM records the result in the final receipt and a compact report under `notes/`. If a separate reviewer is unavailable, disclose that limitation and do not call a PM self-review independent or mark the contract fully audited. Do not mark `full_outcome_complete: true` while an independent audit is missing or a criterion is unmet or unverified. Report those gaps to the owner for review before undertaking further implementation; do not silently revise the contract or repair them during the audit.
 
 For execution goals, completion also requires implementation evidence. A final audit cannot call the goal done if the only completed work is planning, discovery, or task selection.
 

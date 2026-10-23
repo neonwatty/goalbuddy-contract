@@ -4,6 +4,23 @@
 
 <User-editable objective. Keep this bounded to the current tranche, not an infinite mission.>
 
+## Owner-Approved Contract
+
+- Confirmed by: unconfirmed
+- Intended outcome: <what the user must be able to do, learn, or decide>
+- Breadth: <included work and explicit exclusions>
+- Deliverables: <reviewable outputs>
+- QA: <relevant tests and, for feature/UX/creation work, a browser or manual walkthrough>
+- Stop or blocked condition: <what warrants stopping or requesting a decision>
+
+### Acceptance Criteria
+
+| ID | Observable condition | Evidence required |
+| --- | --- | --- |
+| AC-1 | <condition the owner can judge> | <test, walkthrough, artifact, metric, or source-backed finding> |
+
+Replace `unconfirmed` with the owner's explicit confirmation and date when they approve the completed contract. Goal Prep waits for that approval before creating a board; `goalbuddy init` creates only an unconfirmed scaffold. The goal oracle below summarizes these criteria; it does not replace them. Material changes to the outcome, breadth, or criteria require renewed owner review. The final audit reports each ID as `met`, `unmet`, or `unverified` with evidence, then checks the original outcome and constraints separately.
+
 ## Original Request
 
 <Shortest faithful copy of what the user asked for. Preserve user-provided plan details here or summarize them under Intake Summary.>
@@ -26,7 +43,7 @@ The oracle for this goal is:
 
 `<specific observable signal>`
 
-The PM must keep comparing task receipts to this oracle. Planning, discovery, a passing tiny slice, or a clean-looking board is not enough. The goal finishes only when a final Judge/PM audit maps receipts and verification back to this oracle and records `full_outcome_complete: true`.
+The PM must keep comparing task receipts to this oracle and the acceptance criteria above. Planning, discovery, a passing tiny slice, or a clean-looking board is not enough. The goal finishes only when a final audit maps receipts and verification to every criterion and the original outcome, then records `full_outcome_complete: true`.
 
 ## Goal Kind
 

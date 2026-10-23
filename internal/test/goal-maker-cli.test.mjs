@@ -1591,6 +1591,7 @@ test("init scaffolds a working board from the bundled templates", () => {
     assert.equal(created.status, 0, created.stderr || created.stdout);
     const report = JSON.parse(created.stdout);
     assert.equal(report.slug, "ship-widgets");
+    assert.equal(report.contract_confirmed, false);
     assert.equal(report.run_command, "/goal Follow docs/goals/ship-widgets/goal.md.");
     assert.equal(report.claude_run_command, "/goalbuddy Follow docs/goals/ship-widgets/goal.md.");
     const state = readFileSync(join(root, "docs", "goals", "ship-widgets", "state.yaml"), "utf8");
@@ -1598,6 +1599,8 @@ test("init scaffolds a working board from the bundled templates", () => {
     assert.match(state, /slug: "ship-widgets"/);
     assert.match(state, /title: "Ship Widgets"/);
     assert.equal(existsSync(join(root, "docs", "goals", "ship-widgets", "notes")), true);
+    const charter = readFileSync(join(root, "docs", "goals", "ship-widgets", "goal.md"), "utf8");
+    assert.match(charter, /Confirmed by:.*unconfirmed/);
 
     const resume = runGoalMaker(["resume", "--json"], { cwd: root });
     assert.equal(resume.status, 0, resume.stderr || resume.stdout);

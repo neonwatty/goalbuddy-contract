@@ -41,6 +41,8 @@ test("Goal Prep invocation boundary keeps $goal-prep prepare-only", () => {
     assert.match(text, /Do you want the local GoalBuddy board for this goal\?/);
     assert.match(text, /Use the local GoalBuddy board as the default work surface/);
     assert.match(text, /start the local board before filling the task list/);
+    assert.match(text, /Wait for the owner's explicit confirmation of the displayed contract/);
+    assert.match(text, /Give each criterion a stable `AC-#` ID and its proof/);
     assert.match(text, /node <skill-path>\/surfaces\/local-goal-board\/scripts\/local-goal-board\.mjs --goal docs\/goals\/<slug>/);
     assert.match(text, /do not assume the existing process is stale and do not stop it/);
     assert.match(text, /First check `http:\/\/127\.0\.0\.1:41737\/api\/boards`/);
@@ -82,6 +84,7 @@ test("the execution contract carries the harness-specific runtime rules", () => 
     assert.match(text, /Never edit product implementation files during board-health work/);
     assert.match(text, /goalbuddy_receipt_v1/);
     assert.match(text, /full_outcome_complete: true/);
+    assert.match(text, /Do not mark `full_outcome_complete: true` while an independent audit is missing or a criterion is unmet or unverified/);
     assert.match(text, /A `done` Worker receipt must list only passing commands/);
     assert.match(text, /result: blocked/);
     assert.match(text, /blocked_reason/);
