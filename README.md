@@ -2,7 +2,18 @@
 
 > **Experimental fork:** [neonwatty/goalbuddy-contract](https://github.com/neonwatty/goalbuddy-contract) adds an owner-reviewed acceptance contract to Goal Prep. It has not been published as an npm release. The [upstream project](https://github.com/tolimarchuk/goalbuddy) remains the source of the GoalBuddy engine.
 
-> The `npx goalbuddy` instructions below install the upstream release. They do not install this experimental fork. This fork's changes are available for source review and local testing until we validate an installation and naming path.
+> The `npx goalbuddy` instructions below install the upstream release. They do not install this experimental fork. Use the local Codex plugin path below to test the fork.
+
+## Dogfood this fork in Codex
+
+The Codex plugin has the separate identity `goalbuddy-contract@goalbuddy-contract-local`, so it can coexist with upstream `goalbuddy@goalbuddy`. From a checkout of the `feat/owner-approved-contract` branch, run:
+
+```bash
+codex plugin marketplace add /absolute/path/to/goalbuddy-contract
+codex plugin add goalbuddy-contract@goalbuddy-contract-local
+```
+
+Restart Codex and start a fresh chat. Invoke `$goalbuddy-contract:goal-prep` explicitly to test the fork's intake and contract review. The ordinary `$goalbuddy:goal-prep` continues to refer to upstream. The CLI command `npx goalbuddy` also remains upstream; do not use it to install this fork. To remove only the dogfood plugin, run `codex plugin remove goalbuddy-contract@goalbuddy-contract-local`.
 
 <p align="center">
   <a href="https://goalbuddy.dev">
