@@ -1,5 +1,20 @@
 # GoalBuddy
 
+> **Experimental fork:** [neonwatty/goalbuddy-contract](https://github.com/neonwatty/goalbuddy-contract) adds an owner-reviewed acceptance contract to Goal Prep. It has not been published as an npm release. The [upstream project](https://github.com/tolimarchuk/goalbuddy) remains the source of the GoalBuddy engine.
+
+> The `npx goalbuddy` instructions below install the upstream release. They do not install this experimental fork. Use the local Codex plugin path below to test the fork.
+
+## Dogfood this fork in Codex
+
+The Codex plugin has the separate identity `goalbuddy-contract@goalbuddy-contract-local`, so it can coexist with upstream `goalbuddy@goalbuddy`. From a checkout of the `feat/owner-approved-contract` branch, run:
+
+```bash
+codex plugin marketplace add /absolute/path/to/goalbuddy-contract
+codex plugin add goalbuddy-contract@goalbuddy-contract-local
+```
+
+Restart Codex and start a fresh chat. Invoke `$goalbuddy-contract:goal-prep` explicitly to test the fork's intake and contract review. The ordinary `$goalbuddy:goal-prep` continues to refer to upstream. The CLI command `npx goalbuddy` also remains upstream; do not use it to install this fork. To remove only the dogfood plugin, run `codex plugin remove goalbuddy-contract@goalbuddy-contract-local`.
+
 <p align="center">
   <a href="https://goalbuddy.dev">
     <img src="internal/assets/goalbuddy-readme-hero.png" alt="GoalBuddy local board and agent workflow." width="100%">
@@ -17,6 +32,8 @@
 </p>
 
 GoalBuddy helps Codex and Claude Code stay oriented during long coding tasks by giving each harness's execution command a finish line, a live work surface, and a proof loop.
+
+In this fork, Goal Prep interviews the owner until the outcome, scope, acceptance criteria, and evidence are clear. It shows a concise contract and waits for explicit confirmation before creating a board. The confirmed contract lives in `docs/goals/<slug>/goal.md`; `state.yaml` continues to track tasks and receipts. A separate read-only Judge checks each acceptance criterion and the original outcome at the end. These are skill instructions; the existing CLI does not mechanically prove owner confirmation or reviewer independence.
 
 It gives a goal run a small local workspace: a charter, a goal oracle, a board, notes, receipts, and a clear next task. The work stays in your repo, so a run can pause, resume, verify, and keep going without re-inventing the plan every turn.
 

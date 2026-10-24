@@ -713,7 +713,7 @@ When invoked through $${legacySkillName}:
 
 1. Tell the user Goal Maker has been rebranded to GoalBuddy.
 2. Show the canonical command: $${canonicalSkillName}.
-3. If the user wants to continue immediately, follow the same workflow as $${canonicalSkillName}: run diagnostic intake, create or repair \`docs/goals/<slug>/goal.md\` and \`state.yaml\`, preserve one active task, and print the matching execution commands for Codex (\`/goal Follow docs/goals/<slug>/goal.md.\`) and Claude Code (\`/goalbuddy Follow docs/goals/<slug>/goal.md.\`) without starting either automatically.
+3. If the user wants to continue immediately, follow the same workflow as $${canonicalSkillName}: run diagnostic intake, show the goal contract, wait for explicit owner confirmation, then create or repair \`docs/goals/<slug>/goal.md\` and \`state.yaml\`, preserve one active task, and print the matching execution commands for Codex (\`/goal Follow docs/goals/<slug>/goal.md.\`) and Claude Code (\`/goalbuddy Follow docs/goals/<slug>/goal.md.\`) without starting either automatically.
 
 This alias has the same invocation boundary as \`$${canonicalSkillName}\`: prepare the board only. Do not use or refresh named skills, inspect implementation files, browse references, research, generate assets, or perform the requested work until the user starts the printed \`/goal\` command.
 `;
@@ -1306,13 +1306,13 @@ function initGoal() {
   const runCommand = `/goal Follow docs/goals/${slug}/goal.md.`;
   const claudeRunCommand = `/goalbuddy Follow docs/goals/${slug}/goal.md.`;
   if (hasFlag("--json")) {
-    printJson({ created: goalDir, slug, title, run_command: runCommand, claude_run_command: claudeRunCommand });
+    printJson({ created: goalDir, slug, title, contract_confirmed: false, run_command: runCommand, claude_run_command: claudeRunCommand });
     return;
   }
   console.log(`Created GoalBuddy board: docs/goals/${slug}/`);
-  console.log("Next: refine the charter and intake with $goal-prep (Codex) or /goal-prep (Claude Code),");
-  console.log(`or start execution in Codex: ${runCommand}`);
-  console.log(`or start execution in Claude Code: ${claudeRunCommand}`);
+  console.log("Contract unconfirmed. Use $goal-prep (Codex) or /goal-prep (Claude Code) to review it with the owner.");
+  console.log(`After confirmation, start execution in Codex: ${runCommand}`);
+  console.log(`After confirmation, start execution in Claude Code: ${claudeRunCommand}`);
 }
 
 function receiptCli() {

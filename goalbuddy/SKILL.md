@@ -12,7 +12,7 @@ GoalBuddy is for autonomous, long-running Codex or Claude Code work where the PM
 The loop is:
 
 ```text
-raw user intent -> intake compiler -> goal oracle -> local work surface -> one active task -> receipt -> proof loop -> repeat
+raw user intent -> intake compiler -> owner-approved contract -> goal oracle -> local work surface -> one active task -> receipt -> proof loop -> repeat
 ```
 
 GoalBuddy's core invariant is:
@@ -39,7 +39,7 @@ During a `$goal-prep` turn, do not perform the user's requested work, even if th
 Allowed `$goal-prep` actions:
 
 - run the bundled GoalBuddy update checker and mention a newer version if one is available;
-- ask diagnostic intake questions and wait when required;
+- ask diagnostic intake questions, show the goal contract, and wait for the owner's explicit confirmation;
 - create or repair only `docs/goals/<slug>/goal.md`, `docs/goals/<slug>/state.yaml`, `docs/goals/<slug>/notes/`, and the generated `.goalbuddy-board/` visual board artifact;
 - create and open the built-in local GoalBuddy board surface for the goal unless the user opts out;
 - optionally run the GoalBuddy board checker against that `state.yaml`;
@@ -79,6 +79,8 @@ Extract:
 - authority: `requested | approved | inferred | needs_approval | blocked`;
 - proof type: `test | demo | artifact | metric | review | source_backed_answer | decision`;
 - completion proof: the observable signal for full outcome completion;
+- acceptance criteria: stable AC IDs, observable conditions, and the evidence expected for each;
+- QA: relevant tests plus a browser or manual walkthrough for feature, UX, and creation goals by default;
 - goal oracle: the live check, walkthrough, artifact, metric, or decision that will keep pressure on the goal and prevent early completion;
 - likely misfire: how `/goal` could succeed at the wrong thing;
 - blind spots: important risks, choices, or success dimensions the user may not have named yet;
@@ -92,20 +94,20 @@ Do you want the local GoalBuddy board for this goal?
 
 Recommended options:
 
-1. Local live board (Recommended) - starts immediately, requires no credentials, and lets the user watch tasks populate inside Codex or Claude Code.
+1. Local live board (Recommended) - starts after contract confirmation, requires no credentials, and lets the user watch tasks populate inside Codex or Claude Code.
 2. No visual board - best for quick or private goals where the file board is enough.
 
-If the user chooses the local live board, create the goal directory, `notes/`, and an initial minimal `state.yaml` as soon as the slug is known, then run `node <skill-path>/surfaces/local-goal-board/scripts/local-goal-board.mjs --goal docs/goals/<slug>` and open the printed local URL in the AI coding agent's in-app browser (the Codex in-app Browser, the Claude Code preview, or the user's regular browser). The default local hub is `http://goalbuddy.localhost:41737/`, and board URLs normally look like `http://goalbuddy.localhost:41737/<slug>/`. In short: start the local board before filling the task list so the board pops up right away and cards populate live as `state.yaml` changes. Include the printed board URL in the final prep response as an actual clickable Markdown link, for example `[Open GoalBuddy board](http://goalbuddy.localhost:41737/<slug>/)`. Do not put the board URL only in a code block, quote, HTML comment, or prose that the UI cannot click.
+After the owner confirms the contract, if they chose the local live board, create the goal directory, `notes/`, and an initial minimal `state.yaml`, then run `node <skill-path>/surfaces/local-goal-board/scripts/local-goal-board.mjs --goal docs/goals/<slug>` and open the printed local URL in the AI coding agent's in-app browser (the Codex in-app Browser, the Claude Code preview, or the user's regular browser). The default local hub is `http://goalbuddy.localhost:41737/`, and board URLs normally look like `http://goalbuddy.localhost:41737/<slug>/`. After confirmation, start the local board before filling the task list so cards populate live as `state.yaml` changes. Include the printed board URL in the final prep response as an actual clickable Markdown link, for example `[Open GoalBuddy board](http://goalbuddy.localhost:41737/<slug>/)`. Do not put the board URL only in a code block, quote, HTML comment, or prose that the UI cannot click.
 
 If `http://goalbuddy.localhost:41737/<slug>/` returns 404, do not assume the existing process is stale and do not stop it. First check `http://127.0.0.1:41737/api/boards`. If that endpoint returns board JSON, the port is the shared multi-board hub; rerun `node <skill-path>/surfaces/local-goal-board/scripts/local-goal-board.mjs --goal <absolute-goal-path>` if needed so the new goal registers on the same port. Only stop a specific process on 41737 when `/api/boards` is missing, returns 404, or otherwise proves the listener is not a current GoalBuddy multi-board hub.
 
 If the user wants an external board, GitHub sync, Slack digest, Linear handoff, or any other custom integration, do not install a GoalBuddy catalog item. Treat it as normal implementation work: create a concrete task that designs and verifies that integration inside the target repo or asks the operator for the required credentials and scope.
 
-Ask before board creation when the request is vague, strategic, improvement-oriented, or open-ended and the user has not explicitly said to use defaults. Ask one guided question at a time with 2-3 options and a recommended default, then wait. Continue the diagnostic intake until the user's answers are sufficient to choose the board shape. Do not create or repair `docs/goals/<slug>/` until the diagnostic intake is complete or the user explicitly accepts defaults.
+Ask before board creation when the request is vague, strategic, improvement-oriented, or open-ended and the user has not explicitly said to use defaults. Ask one guided question at a time with 2-3 options and a recommended default, then wait. Continue the diagnostic intake until the user's answers are sufficient to choose the board shape. Even when the user accepts defaults, show the proposed contract and wait for explicit confirmation before creating `docs/goals/<slug>/`.
 
 For vague or strategic goals, one answer is rarely enough. After each answer, reflect what it implies, name one likely blind spot, and ask the next material question. The goal is to help the user discover what they mean, not merely collect a form value.
 
-Proceed with labeled assumptions and seed a safe board only when at least one is true:
+Proceed with labeled assumptions to the contract review only when at least one is true:
 
 - the user provides a specific outcome and enough completion proof to choose the first phase;
 - the user provides an existing plan or concrete artifact to validate;
@@ -123,6 +125,14 @@ Examples:
 - Audit: keep the board read-only unless the user approves follow-up execution.
 
 The intake compiler is an internal strut for `/goal`: it exists to make the first board correct, not to create process theater.
+
+## Owner-Approved Goal Contract
+
+Before creating or repairing a board, show a concise contract for the owner's review. Include the intended user outcome; breadth and exclusions; deliverables; numbered, observable acceptance criteria with the evidence expected for each; QA; constraints; and stop or blocked conditions. Start from the concrete user outcome and widen scope only when necessary. Ask targeted follow-ups until the owner can judge what done means. For experiments or research, ask which finish they want (for example, a decision, measured result, prototype, or report) instead of assuming one. State material assumptions and unresolved decisions plainly.
+
+Wait for the owner's explicit confirmation of the displayed contract. A request to prepare a goal, permission to use defaults, or silence is not confirmation. Do not create or repair `docs/goals/<slug>/`, start the board, print a run command, or start product work before confirmation. If an existing confirmed board is being resumed, use its charter; ask for renewed confirmation only when a material outcome, scope, or acceptance change is proposed.
+
+After confirmation, put the contract in `docs/goals/<slug>/goal.md` as the single acceptance source. Give each criterion a stable `AC-#` ID and its proof. The goal oracle may summarize the criteria but must not replace them. `state.yaml` remains the source of truth for task status, receipts, verification freshness, and completion state. Do not create a parallel contract file or silently alter confirmed criteria; show material changes to the owner for review first.
 
 ## Guided Intake Surface
 
@@ -142,7 +152,7 @@ One possible blind spot: [a risk, unstated choice, or success dimension the user
 My default would be [option] because [short reason].
 ```
 
-Stop after each question. Do not create files, repair an existing board, run checks, or print `/goal` until the diagnostic intake is complete. Do not dump the private intake.
+Stop after each question. Do not create files, repair an existing board, run checks, or print `/goal` until the diagnostic intake and contract confirmation are complete. Do not dump the private intake.
 
 Minimum diagnostic ladder for vague, strategic, or improvement-oriented goals:
 
@@ -158,7 +168,7 @@ For "make GoalBuddy better", a good first question is which improvement target m
 
 ## What `$goal-prep` Does
 
-When invoked directly, run intake first. For vague, strategic, improvement-oriented, or open-ended input, run the diagnostic intake and stop before creating or repairing the board until enough material answers are known. For sufficiently clear, planned, recovery, audit, or explicitly-defaulted input, prepare or repair the board and stop for user choice.
+When invoked directly, run intake first. For vague, strategic, improvement-oriented, or open-ended input, run the diagnostic intake until enough material answers are known. For sufficiently clear, planned, recovery, audit, or explicitly-defaulted input, proceed to the contract review. Create or repair a board only after the owner confirms the proposed contract, then stop for user choice.
 
 Do:
 
@@ -166,12 +176,13 @@ Do:
 - clarify or infer the goal title and slug;
 - run the Intake Compiler;
 - ask diagnostic intake questions when clarity would materially improve the board;
+- show the concise goal contract and wait for explicit owner confirmation before writing board files;
 - classify the goal as `specific`, `open_ended`, `existing_plan`, `recovery`, or `audit`;
 - scan environment reality before seeding: existing worktrees, branches, or goal directories matching the slug, so the first task starts from what exists instead of assuming a fresh workspace;
 - inventory the repo's verify-style scripts once and record which are gate suites for this goal versus pre-existing red repo-health suites, so the oracle is honest about what this goal owns;
 - create or repair `docs/goals/<slug>/`;
 - create `goal.md`, `state.yaml`, and `notes/`;
-- start the local board immediately and open it in the AI coding agent's in-app browser (Codex in-app Browser, Claude Code preview, or the user's regular browser) before filling the task list, unless the user opts out;
+- after confirmation, start the local board and open it in the AI coding agent's in-app browser (Codex in-app Browser, Claude Code preview, or the user's regular browser) before filling the task list, unless the user opts out;
 - seed a role-tagged task board that matches the input shape;
 - make the first active task safe;
 - verify Scout, Worker, and Judge agent availability or record an explicit truthful state;
@@ -184,6 +195,7 @@ Do not:
 - use, refresh, inspect, or load named skills requested by the goal; schedule that as `/goal` work instead;
 - browse links, inspect reference repos, read implementation files, generate design plans, generate images, or create assets for the requested outcome;
 - create or repair a board from vague/open-ended input before diagnostic intake is complete;
+- create or repair a board before the owner confirms the displayed goal contract;
 - create `evidence.jsonl`, `units/`, or `artifacts/` for new v2 goals;
 - edit implementation files before the board exists;
 - invent implementation tasks from vibes when the intake requires Scout, Judge, or plan validation first;

@@ -9,15 +9,15 @@ const plugin = JSON.parse(readFileSync("plugins/goalbuddy/.codex-plugin/plugin.j
 const claudePlugin = JSON.parse(readFileSync("plugins/goalbuddy/.claude-plugin/plugin.json", "utf8"));
 
 test("GoalBuddy plugin is exposed through a Codex marketplace manifest", () => {
-  assert.equal(marketplace.name, "goalbuddy");
-  assert.equal(marketplace.interface.displayName, "GoalBuddy");
+  assert.equal(marketplace.name, "goalbuddy-contract-local");
+  assert.equal(marketplace.interface.displayName, "GoalBuddy Contract (local)");
   assert.equal(marketplace.plugins.length, 1);
 
   const [entry] = marketplace.plugins;
-  assert.equal(entry.name, "goalbuddy");
+  assert.equal(entry.name, "goalbuddy-contract");
   assert.equal(entry.source.source, "local");
   assert.equal(entry.source.path, "./plugins/goalbuddy");
-  assert.equal(entry.policy.installation, "INSTALLED_BY_DEFAULT");
+  assert.equal(entry.policy.installation, "AVAILABLE");
   assert.equal(entry.category, "Coding");
 });
 
@@ -33,21 +33,21 @@ test("GoalBuddy plugin is exposed through a Claude marketplace manifest", () => 
 });
 
 test("GoalBuddy plugin metadata tracks the package release", () => {
-  assert.equal(plugin.name, pkg.name);
+  assert.equal(plugin.name, "goalbuddy-contract");
   assert.equal(plugin.version, pkg.version);
-  assert.equal(plugin.repository, "https://github.com/tolimarchuk/goalbuddy");
+  assert.equal(plugin.repository, "https://github.com/neonwatty/goalbuddy-contract");
   assert.equal(plugin.skills, "./skills/");
 });
 
 test("Claude plugin metadata stays aligned with package release", () => {
   assert.equal(claudePlugin.name, pkg.name);
   assert.equal(claudePlugin.version, pkg.version);
-  assert.equal(claudePlugin.description, plugin.description);
+  assert.match(claudePlugin.description, /Codex and Claude Code/);
   assert.ok(!claudePlugin.keywords.includes("extensions"));
 });
 
 test("GoalBuddy plugin delegates composer invocation to Goal Prep", () => {
   assert.deepEqual(plugin.interface.defaultPrompt, [
-    "$goal-prep prepare a GoalBuddy board for this goal",
+    "$goalbuddy-contract:goal-prep prepare an owner-approved GoalBuddy board for this goal",
   ]);
 });
